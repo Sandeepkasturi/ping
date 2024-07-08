@@ -111,20 +111,20 @@ def assign_temp_password(username, temp_password):
 
 # Streamlit UI Components
 
-# Login form
-def login_form():
-    st.subheader("Login")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
+def admin_login_form():
+    st.subheader("Admin Login")
+    username = st.text_input("Admin Username")
+    password = st.text_input("Admin Password", type="password")
     if st.button("Login"):
-        user = login_user(username, password)
-        if user:
+        admin_username = st.secrets["admin"]["username"]
+        admin_password = st.secrets["admin"]["password"]
+        if username == admin_username and password == admin_password:
             st.session_state.username = username
             st.session_state.logged_in = True
-            st.session_state.is_admin = is_admin(username)
+            st.session_state.is_admin = True
             st.experimental_rerun()
         else:
-            st.error("Invalid username or password")
+            st.error("Invalid admin username or password")
 
 
 # Register form
