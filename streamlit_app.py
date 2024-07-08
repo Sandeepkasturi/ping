@@ -175,6 +175,7 @@ def admin_login_form():
 
 # Admin interface
 def admin_interface():
+    st.image("ping.png", use_column_width=True)
     st.title(f"Welcome, {st.session_state['username']}!")
     action = st.selectbox("Admin Actions",
                           ["View Users", "Delete User", "Modify User", "Add Temporary Passwords", "View Messages",
@@ -345,7 +346,7 @@ def chat_interface():
 
 # Main application logic
 def main():
-    st.title("Chat Application")
+    st.title("PING ⚡")
     if 'username' not in st.session_state:
         st.session_state['username'] = ""
     if 'logged_in' not in st.session_state:
@@ -359,6 +360,7 @@ def main():
         else:
             chat_interface()
     else:
+        st.sidebar.image("ping.png", use_column_width=True)
         option = st.sidebar.selectbox("Select an option", ["Login", "Register", "Forgot Password", "Admin Login"])
         if option == "Login":
             login_form()
