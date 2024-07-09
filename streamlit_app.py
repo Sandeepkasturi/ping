@@ -111,13 +111,28 @@ def assign_temp_password(username, temp_password):
 
 # Streamlit UI Components
 
+def login_form():
+    st.subheader("Login")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        user = login_user(username, password)
+        if user:
+            st.session_state.username = username
+            st.session_state.logged_in = True
+            st.session_state.is_admin = is_admin(username)
+            st.experimental_rerun()
+        else:
+            st.error("Invalid username or password")
+
+
 def admin_login_form():
     st.subheader("Admin Login")
     username = st.text_input("Admin Username")
     password = st.text_input("Admin Password", type="password")
     if st.button("Login"):
-        admin_username = st.secrets["admin"]["username"]
-        admin_password = st.secrets["admin"]["password"]
+        admin_username = "admin_ping"
+        admin_password = "ping_network@admin"
         if username == admin_username and password == admin_password:
             st.session_state.username = username
             st.session_state.logged_in = True
@@ -155,22 +170,6 @@ def forgot_password_form():
             st.info(f"Your temporary password is: {temp_password}. Please use this to log in.")
         else:
             st.error("No temporary passwords available. Please contact support.")
-
-
-# Admin login form
-def admin_login_form():
-    st.subheader("Admin Login")
-    username = st.text_input("Admin Username")
-    password = st.text_input("Admin Password", type="password")
-    if st.button("Login"):
-        user = login_user(username, password)
-        if user and is_admin(username):
-            st.session_state.username = username
-            st.session_state.logged_in = True
-            st.session_state.is_admin = True
-            st.experimental_rerun()
-        else:
-            st.error("Invalid admin username or password")
 
 
 # Admin interface
@@ -251,7 +250,6 @@ def admin_interface():
             st.success("All messages deleted successfully.")
 
 
-
 # Chat interface with AI integration
 def chat_interface():
     st.subheader(f"Welcome, {st.session_state.username}!")
@@ -276,8 +274,8 @@ def chat_interface():
                         question = message.replace("@autobot", "").strip()
                         response = model.generate_content(question)
                         if response.text:
-                            ai_response = f"""{st.session_state['username']} pinged Autobot about {question}, 
-                            Here is the response: {response.text}"""
+                            ai_response = f"{st.session_state['username']} pinged Autobot about {question}, " \
+                                          f"Here is the response: {response.text}"
                             add_message("AutoBot", ai_response)
                         else:
                             st.error("No valid response received from the AI model.")
@@ -341,7 +339,6 @@ def chat_interface():
         )
 
     st.markdown("</div>", unsafe_allow_html=True)
-
 
 
 # Main application logic
