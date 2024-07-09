@@ -1,3 +1,4 @@
+# Developed by Sandeep Kasturi.
 import streamlit as st
 import sqlite3
 import hashlib
@@ -12,6 +13,26 @@ import time
 configure(api_key=st.secrets["api_key"])
 model = GenerativeModel('gemini-pro')
 st.set_page_config(page_title="PING", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
+
+# Display footer
+def display_footer():
+    footer_html = """
+    <style>
+    .footer {
+        padding: 10px;
+        background-color: #f8f9fa;
+        text-align: center;
+        border-top: 1px solid #e1e1e1;
+        font-family: 'Arial', sans-serif;
+        color: #6c757d;
+    }
+    </style>
+    <div class="footer">
+        <p><b>&copy; 2024 SKAV TECH. All rights reserved. | Follow us on <a href="https://bit.ly/socialinstag">Instagram</a></b></p>
+    </div>
+    """
+    st.markdown(footer_html, unsafe_allow_html=True)
+
 # Initialize database connection
 def init_db():
     conn = sqlite3.connect('chat.db')
@@ -363,7 +384,8 @@ def chat_interface():
     st.button("Refresh", on_click=st.experimental_rerun)
     time.sleep(2)
     st.experimental_rerun()
-
+    st.markdown('---')
+    display_footer()
 # Main application logic
 def main():
     st.title("PING ⚡")
@@ -381,6 +403,8 @@ def main():
             chat_interface()
     else:
         st.sidebar.image("ping.png", use_column_width=True)
+        st.markdown('---')
+        display_footer()
         option = st.sidebar.selectbox("Select an option", ["Login", "Register", "Forgot Password", "Delete Account", "Admin Login"])
         if option == "Login":
             login_form()
