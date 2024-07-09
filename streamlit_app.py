@@ -25,12 +25,25 @@ def display_footer():
         border-top: 1px solid #e1e1e1;
         font-family: 'Arial', sans-serif;
         color: #6c757d;
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+    }
+    .footer p {
+        margin: 5px 0;
+    }
+    .footer a {
+        color: #007bff;
+        text-decoration: none;
+    }
+    .footer a:hover {
+        text-decoration: underline;
     }
     </style>
     <div class="footer">
-    
         <p><b>Developed by Sandeep Kasturi. Founder SKAV TECH</b></p>
-        <p><b>&copy; 2024 SKAV TECH. All rights reserved. | Follow us on <a href="https://bit.ly/socialinstag">Instagram</a></b></p>
+        <p>&copy; 2024 SKAV TECH. All rights reserved. | Follow us on <a href="https://bit.ly/socialinstag">Instagram</a></p>
     </div>
     """
     st.markdown(footer_html, unsafe_allow_html=True)
@@ -147,7 +160,6 @@ def login_form():
             st.experimental_rerun()
         else:
             st.error("Invalid username or password")
-
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -386,6 +398,7 @@ def chat_interface():
     st.button("Refresh", on_click=st.experimental_rerun)
     time.sleep(2)
     st.experimental_rerun()
+
 # Main application logic
 def main():
     st.title("PING ⚡")
