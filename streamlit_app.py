@@ -28,6 +28,8 @@ def display_footer():
     }
     </style>
     <div class="footer">
+    
+        <p><b>Developed by Sandeep Kasturi. Founder SKAV TECH</b></p>
         <p><b>&copy; 2024 SKAV TECH. All rights reserved. | Follow us on <a href="https://bit.ly/socialinstag">Instagram</a></b></p>
     </div>
     """
@@ -384,8 +386,6 @@ def chat_interface():
     st.button("Refresh", on_click=st.experimental_rerun)
     time.sleep(2)
     st.experimental_rerun()
-    st.markdown('---')
-    display_footer()
 # Main application logic
 def main():
     st.title("PING ⚡")
@@ -403,19 +403,27 @@ def main():
             chat_interface()
     else:
         st.sidebar.image("ping.png", use_column_width=True)
-        st.markdown('---')
-        display_footer()
         option = st.sidebar.selectbox("Select an option", ["Login", "Register", "Forgot Password", "Delete Account", "Admin Login"])
         if option == "Login":
             login_form()
+            st.markdown('---')
+            display_footer()
         elif option == "Register":
             register_form()
+            st.markdown('---')
+            display_footer()
         elif option == "Forgot Password":
             forgot_password_form()
+            st.markdown('---')
+            display_footer()
         elif option == "Delete Account":
             delete_account_form()
+            st.markdown('---')
+            display_footer()
         elif option == "Admin Login":
             admin_login_form()
+            st.markdown('---')
+            display_footer()
 
 if __name__ == "__main__":
     main()
