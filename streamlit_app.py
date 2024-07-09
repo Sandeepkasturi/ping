@@ -134,8 +134,8 @@ def admin_login_form():
     username = st.text_input("Admin Username")
     password = st.text_input("Admin Password", type="password")
     if st.button("Login"):
-        admin_username = "admin_ping"
-        admin_password = "ping_network@admin"
+        admin_username = st.secrets["username"]
+        admin_password = st.secrets["password"]
         logging.info(f"Attempting admin login with username: {username}")
         if username == admin_username and password == admin_password:
             st.session_state.username = username
