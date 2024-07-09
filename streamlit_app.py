@@ -11,7 +11,7 @@ import time
 # Configure the AI model
 configure(api_key=st.secrets["api_key"])
 model = GenerativeModel('gemini-pro')
-
+ st.set_page_config(page_title="PING", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
 # Initialize database connection
 def init_db():
     conn = sqlite3.connect('chat.db')
