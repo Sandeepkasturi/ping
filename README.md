@@ -41,16 +41,19 @@ PING is a chat application developed by Sandeep Kasturi using Streamlit. It allo
 4. Run the application:
 
    ```bash
-   streamlit run app.py
+   streamlit run streamlit_app.py
    ```
 
 ## Usage
 
-- Launch the application by running `app.py`.
+- Launch the application by running `streamlit_app.py`.
 - Use the sidebar to select login, registration, password reset, account deletion, or admin login.
 - Upon login, users can send messages in the chat interface. Use `@autobot` followed by a question to interact with the AI assistant.
 
 ## Screenshots
+
+![Registar](screenshots/registar.png)
+*Registaration Page*
 
 ![Login Page](screenshots/login.png)
 *Login Page*
@@ -68,7 +71,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-For any inquiries or support, please contact Sandeep Kasturi at sandeep@example.com.
+For any inquiries or support, please contact Sandeep Kasturi at skavtechin@gmail.com
 
 ---
 
