@@ -134,8 +134,8 @@ def admin_login_form():
     username = st.text_input("Admin Username")
     password = st.text_input("Admin Password", type="password")
     if st.button("Login"):
-        admin_username = st.secrets["username"]
-        admin_password = st.secrets["password"]
+        admin_username = st.secrets["admin_username"]
+        admin_password = st.secrets["admin_password"]
         logging.info(f"Attempting admin login with username: {username}")
         if username == admin_username and password == admin_password:
             st.session_state.username = username
