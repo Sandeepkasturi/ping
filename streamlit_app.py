@@ -3,13 +3,14 @@ import sqlite3
 import hashlib
 import random
 import string
+import logging
 from datetime import datetime
 from google.generativeai import configure, GenerativeModel
+import time
 
 # Configure the AI model
 configure(api_key=st.secrets["api_key"])
 model = GenerativeModel('gemini-pro')
-
 
 # Initialize database connection
 def init_db():
@@ -30,7 +31,6 @@ def init_db():
     conn.commit()
     return conn
 
-
 # Add a new user to the database
 def register_user(username, password):
     conn = init_db()
@@ -39,7 +39,6 @@ def register_user(username, password):
     c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
     conn.commit()
     conn.close()
-
 
 # Validate user login
 def login_user(username, password):
@@ -54,9 +53,15 @@ def login_user(username, password):
         c.execute("SELECT * FROM users WHERE username = ? AND temporary_password = ?", (username, password))
         user = c.fetchone()
 
+        if user:
+            # Prevent misuse by verifying the user previously had the password reset
+            c.execute("SELECT temporary_password FROM users WHERE username = ?", (username,))
+            stored_temp_password = c.fetchone()
+            if stored_temp_password[0] != password:
+                user = None
+
     conn.close()
     return user
-
 
 # Check if user is an admin
 def is_admin(username):
@@ -67,7 +72,6 @@ def is_admin(username):
     conn.close()
     return user[0] == 1 if user else False
 
-
 # Add a message to the database
 def add_message(username, message):
     conn = init_db()
@@ -75,7 +79,6 @@ def add_message(username, message):
     c.execute("INSERT INTO messages (username, message) VALUES (?, ?)", (username, message))
     conn.commit()
     conn.close()
-
 
 # Retrieve messages from the database
 def get_messages():
@@ -85,7 +88,6 @@ def get_messages():
     messages = c.fetchall()
     conn.close()
     return messages
-
 
 # Generate a temporary password
 def get_temp_password():
@@ -99,7 +101,6 @@ def get_temp_password():
     conn.close()
     return temp_password[0] if temp_password else None
 
-
 # Assign a temporary password to a user
 def assign_temp_password(username, temp_password):
     conn = init_db()
@@ -107,7 +108,6 @@ def assign_temp_password(username, temp_password):
     c.execute("UPDATE users SET temporary_password = ? WHERE username = ?", (temp_password, username))
     conn.commit()
     conn.close()
-
 
 # Streamlit UI Components
 
@@ -126,6 +126,9 @@ def login_form():
             st.error("Invalid username or password")
 
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
 def admin_login_form():
     st.subheader("Admin Login")
     username = st.text_input("Admin Username")
@@ -133,14 +136,16 @@ def admin_login_form():
     if st.button("Login"):
         admin_username = "admin_ping"
         admin_password = "ping_network@admin"
+        logging.info(f"Attempting admin login with username: {username}")
         if username == admin_username and password == admin_password:
             st.session_state.username = username
             st.session_state.logged_in = True
             st.session_state.is_admin = True
+            logging.info(f"Admin login successful for username: {username}")
             st.experimental_rerun()
         else:
+            logging.warning(f"Admin login failed for username: {username}")
             st.error("Invalid admin username or password")
-
 
 # Register form
 def register_form():
@@ -158,7 +163,6 @@ def register_form():
         else:
             st.error("Passwords do not match")
 
-
 # Forgot password form
 def forgot_password_form():
     st.subheader("Forgot Password")
@@ -171,6 +175,22 @@ def forgot_password_form():
         else:
             st.error("No temporary passwords available. Please contact support.")
 
+# Delete Account form
+def delete_account_form():
+    st.subheader("Delete Account")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Delete Account"):
+        user = login_user(username, password)
+        if user:
+            conn = init_db()
+            c = conn.cursor()
+            c.execute("DELETE FROM users WHERE username = ?", (username,))
+            conn.commit()
+            conn.close()
+            st.success("Account deleted successfully")
+        else:
+            st.error("Invalid username or password")
 
 # Admin interface
 def admin_interface():
@@ -249,7 +269,6 @@ def admin_interface():
             conn.close()
             st.success("All messages deleted successfully.")
 
-
 # Chat interface with AI integration
 def chat_interface():
     st.subheader(f"Welcome, {st.session_state.username}!")
@@ -262,12 +281,10 @@ def chat_interface():
     message = st.text_input("Type your message", key="unique_message_input")
 
     if st.button("Send"):
-
         if message:
             add_message(st.session_state.username, message)
 
             # Check for @autobot and get AI response
-
             if "@autobot" in message:
                 with st.spinner("Generating response..."):
                     try:
@@ -287,7 +304,7 @@ def chat_interface():
         else:
             st.error("Please enter a message.")
 
-    # Message display container
+    # Message display container with auto-refresh
     messages = get_messages()
     st.markdown(
         """
@@ -326,6 +343,8 @@ def chat_interface():
         unsafe_allow_html=True
     )
 
+    message_ids = [msg[0] for msg in messages]
+
     for msg in messages:
         st.markdown(
             f"""
@@ -340,6 +359,10 @@ def chat_interface():
 
     st.markdown("</div>", unsafe_allow_html=True)
 
+    # Refresh messages every 3 seconds
+    st.button("Refresh", on_click=st.experimental_rerun)
+    time.sleep(2)
+    st.experimental_rerun()
 
 # Main application logic
 def main():
@@ -358,16 +381,17 @@ def main():
             chat_interface()
     else:
         st.sidebar.image("ping.png", use_column_width=True)
-        option = st.sidebar.selectbox("Select an option", ["Login", "Register", "Forgot Password", "Admin Login"])
+        option = st.sidebar.selectbox("Select an option", ["Login", "Register", "Forgot Password", "Delete Account", "Admin Login"])
         if option == "Login":
             login_form()
         elif option == "Register":
             register_form()
         elif option == "Forgot Password":
             forgot_password_form()
+        elif option == "Delete Account":
+            delete_account_form()
         elif option == "Admin Login":
             admin_login_form()
-
 
 if __name__ == "__main__":
     main()
